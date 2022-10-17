@@ -9,7 +9,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -18,10 +18,12 @@ services:
   node:
     build: 
       dockerfile: ./docker/node/Dockerfile
+      args:
+        git_repo: ${GIT_REPO}
     ports:
       - "8081:8081"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://node:8081/node/api/v1/result"]
+      test: ["CMD", "curl", "-f", "${NODE_APP_DEFAULT_LINK}"]
       interval: 10s
       timeout: 10s
       retries: 5
@@ -30,6 +32,10 @@ services:
   spring-boot:
     build: 
       dockerfile:  ./docker/java/Dockerfile
+      args:
+        jar_file_name: ${JAR_FILE_NAME}
+        conf_file: ${CONF_FILE}
+        git_repo: ${GIT_REPO}
     ports:
       - "8080:8080"
     restart: unless-stopped
